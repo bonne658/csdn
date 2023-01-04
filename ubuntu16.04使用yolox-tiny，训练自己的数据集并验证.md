@@ -48,7 +48,7 @@ import shutil
 from sklearn.model_selection import train_test_split
 
 labelme_path = "./"              
-saved_path = "./MyVOC/VOC0520"                
+saved_path = "./MyVOC/VOC0520/"                
 
 
 if not os.path.exists(saved_path + "Annotations"):
@@ -128,7 +128,7 @@ ftrainval = open(txtsavepath+'/trainval.txt', 'w')
 #ftest = open(txtsavepath+'/test.txt', 'w')
 ftrain = open(txtsavepath+'/train.txt', 'w')
 fval = open(txtsavepath+'/val.txt', 'w')
-total_files = glob("./MyVOC/Annotations/*.xml")
+total_files = glob(saved_path+"Annotations/*.xml")
 total_files = [i.split("/")[-1].split(".xml")[0] for i in total_files]
 #test_filepath = ""
 for file in total_files:
@@ -150,14 +150,14 @@ ftrain.close()
 fval.close()
 #ftest.close()
 ```
-- 然后`ln -s MyVOC /home/lwd/code/dl/YOLOX/datasets/MyVOC`(换成自己的路径哦)，目录结构如下图
+- 然后`ln -s /home/lwd/data/MyVOC /home/lwd/code/dl/YOLOX/datasets/MyVOC`(换成自己的路径哦)，目录结构如下图
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/e551fe17492e4dd69c836b4f723191f9.png)
 - 接下来修改代码
   - cp exps/default/yolox_tiny.py exps/example/yolox_voc/yolox_voc_tiny.py
   - gedit exps/example/yolox_voc/yolox_voc_tiny.py
   - 在init函数里加`self.num_classes = 3`，换成你的类别数
   - 把`exps/example/yolox_voc/yolox_voc_s.py`里init函数之外的东西复制过来。
-  - 修改训练集路径为`data_dir=os.path.join("/home/lwd/code/dl/YOLOX/datasets", "MyVOC"),`和`image_sets=[('0520', 'trainval')],`。
+  - 修改训练集路径为`data_dir=os.path.join("/home/lwd/code/dl/YOLOX/datasets", "MyVOC"),`和`image_sets=[('0520', 'train')],`。
   - 修改测试集路径为`data_dir=os.path.join("/home/lwd/code/dl/YOLOX/datasets", "MyVOC"),`和`image_sets=[('0520', 'val')],`
   - 再修改类别名称
   - gedit yolox/data/datasets/voc_classes.py
@@ -181,7 +181,8 @@ fval.close()
 if args.demo == "image":
         lwd=os.listdir(args.path)
         for li in lwd:
-        	image_demo(predictor, vis_folder, args.path+'/'+li, current_time, args.save_result)
+        	if not li[-1] == 'g': continue
+            image_demo(predictor, vis_folder, args.path+'/'+li, current_time, args.save_result)
 ```
 - python tools/demo.py image -f exps/example/yolox_voc/yolox_voc_tiny.py -c /home/lwd/code/dl/YOLOX/YOLOX_outputs/yolox_voc_tiny/best_ckpt.pth --path /home/lwd/data/20220523   --conf 0.15 --nms 0.45 --tsize 640 --save_result --device gpu
 - 上面的命令改变了`path`参数的值，填你要测试的图片所在的文件夹
